@@ -1,8 +1,10 @@
 import 'package:biblia/bloc/app_starter/app_starter_bloc.dart';
 import 'package:biblia/bloc/bible_page_changer/bible_page_changer_bloc.dart';
+import 'package:biblia/cubit/bookmark_screen_changer/bookmark_screen_changer_cubit.dart';
 import 'package:biblia/cubit/read_progress/read_progress_cubit.dart';
 import 'package:biblia/repo/bible_repo/bible_repo.dart';
 import 'package:biblia/widget/bible_page/bible_page.dart';
+import 'package:biblia/widget/bookmark_screen/bookmark_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -15,15 +17,18 @@ import 'package:sqflite/sqflite.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final database = openDatabase(
+  Database? database;
+  await openDatabase(
     join(await getDatabasesPath(), 'biblia.db'),
-    onCreate: (db, version) {
-      return db.execute('CREATE TABLE IF NOT EXISTS saved_verses (id INTEGER '
+    onCreate: (db, version) async {
+      await db.execute('CREATE TABLE IF NOT EXISTS saved_verses (id INTEGER '
           'PRIMARY KEY AUTOINCREMENT, book INTEGER, chapter '
           'INTEGER, verse INTEGER)');
+      await db.execute('CREATE TABLE IF NOT EXISTS bookmarks (id INTEGER '
+          'PRIMARY KEY AUTOINCREMENT, pagedataindex INTEGER)');
     },
     version: 1,
-  );
+  ).then((value) => database = value);
 
   final storage = await HydratedStorage.build(
       storageDirectory: await getApplicationDocumentsDirectory());
@@ -35,7 +40,7 @@ Future<void> main() async {
             providers: [
               RepositoryProvider<BibleRepository>(
                   create: (_) => BibleRepository()),
-              RepositoryProvider.value(value: database),
+              RepositoryProvider<Database?>.value(value: database),
             ],
             child: MultiBlocProvider(
               providers: [
@@ -44,6 +49,7 @@ Future<void> main() async {
                     create: (context) => BiblePageChangerBloc(
                         context.read<BibleRepository>().pagesData.length)),
                 BlocProvider(create: (_) => ReadProgressCubit()),
+                BlocProvider(create: (_) => BookmarkScreenChangerCubit()),
               ],
               child: const App(),
             ),
@@ -77,7 +83,7 @@ class App extends StatelessWidget {
                   MediaQuery.of(context).size.height);
 
               RepositoryProvider.of<BibleRepository>(context)
-                  .loadBible()
+                  .loadBible(context.read<Database?>())
                   .then((value) {
                 context.read<AppStarterBloc>().add(AppStarterSuccessEvent());
               });
@@ -151,28 +157,34 @@ class HomePage extends StatelessWidget {
               ),
               onTap: () {
                 Navigator.push(context,
-                        MaterialPageRoute(builder: (_) => const BiblePage()))
-                    .then((value) {
-                  context.read<ReadProgressCubit>().updateProgress(
-                      context.read<BiblePageChangerBloc>().state.pageIndex /
-                          context.read<BiblePageChangerBloc>().maxSize);
-                });
+                    MaterialPageRoute(builder: (_) => const BiblePage()));
+                //     .then((value) {
+                //   context.read<ReadProgressCubit>().updateProgress(
+                //       context.read<BiblePageChangerBloc>().state.pageIndex /
+                //           context.read<BiblePageChangerBloc>().maxSize);
+                // });
               },
             ),
           ),
           Card(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                FaIcon(
-                  FontAwesomeIcons.bookBookmark,
-                  size: 56,
-                ),
-                Padding(
-                  padding: EdgeInsets.only(top: 8),
-                  child: Text('Marcações'),
-                ),
-              ],
+            child: GestureDetector(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  FaIcon(
+                    FontAwesomeIcons.bookBookmark,
+                    size: 56,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(top: 8),
+                    child: Text('Marcações'),
+                  ),
+                ],
+              ),
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => const BookmarkScreen()));
+              },
             ),
           ),
           Card(

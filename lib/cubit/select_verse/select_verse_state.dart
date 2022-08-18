@@ -1,5 +1,7 @@
 part of 'select_verse_cubit.dart';
 
+int idx = 0;
+
 abstract class SelectVerseState extends Equatable {
   final int index;
   const SelectVerseState(this.index);
@@ -9,9 +11,5 @@ abstract class SelectVerseState extends Equatable {
 }
 
 class SelectVerseInitial extends SelectVerseState {
-  const SelectVerseInitial() : super(-1);
-}
-
-class SelectVerseIndex extends SelectVerseState {
-  const SelectVerseIndex(int i) : super(i);
+  SelectVerseInitial() : super(idx++);
 }

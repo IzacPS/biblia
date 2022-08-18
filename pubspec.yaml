@@ -45,6 +45,7 @@ dependencies:
   sqflite: ^2.0.2+1
   path: ^1.8.1
   font_awesome_flutter: ^10.1.0
+  flutter_speed_dial: ^6.0.0
 
 
 
