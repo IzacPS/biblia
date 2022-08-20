@@ -1,4 +1,6 @@
+import 'package:biblia/ad/ad_helper.dart';
 import 'package:biblia/bloc/bible_page_changer/bible_page_changer_bloc.dart';
+import 'package:biblia/cubit/banner_ad/banner_ad_cubit.dart';
 import 'package:biblia/cubit/bookmark_state/bookmark_state_cubit.dart';
 import 'package:biblia/cubit/dropdown_menu_select/dropdown_menu_select_cubit.dart';
 import 'package:biblia/cubit/read_progress/read_progress_cubit.dart';
@@ -16,6 +18,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -109,6 +112,7 @@ class _BiblePageState extends State<BiblePageView>
 
   @override
   Widget build(BuildContext context) {
+    AdHelper.loadPageBanner();
     bible = context.read<BibleRepository>().bible;
     pagesData = context.read<BibleRepository>().pagesData;
     return BlocBuilder<BiblePageChangerBloc, BiblePageChangerState>(
@@ -152,7 +156,11 @@ class _BiblePageState extends State<BiblePageView>
         case ChangePageState.finalize:
         case ChangePageState.none:
         case ChangePageState.initial:
+          debugPrint('initial ------------------------');
           updateProgress(context);
+          // AdHelper.loadAndGetNextPageBanner(() {
+          //   context.read<BannerAdPageCubit>().loaded();
+          // }).then((value) => ad = value);
           break;
         case ChangePageState.exchangeStack:
           break;
@@ -189,19 +197,41 @@ class _BiblePageState extends State<BiblePageView>
                 }
               }
             },
-            child: _biblePageStack(
-              stack1Key: _flipPageNextKey,
-              stack2Key: _flipPagePrevKey,
-              stackIndex: index,
-              bible: bible,
-              pageDataS1Bottom:
-                  pagesData[(state.pageIndex + 1) % state.maxSize],
-              pageDataS1Top: pagesData[state.pageIndex],
-              pageDataS2Bottom: pagesData[(state.pageIndex - 1) < 0
-                  ? state.pageIndex
-                  : state.pageIndex - 1],
-              pageDataS2top: pagesData[state.pageIndex],
-              selectedVerseIndex: state.selectedVerse,
+            child: Column(
+              children: [
+                Expanded(
+                  child: _biblePageStack(
+                    stack1Key: _flipPageNextKey,
+                    stack2Key: _flipPagePrevKey,
+                    stackIndex: index,
+                    bible: bible,
+                    pageDataS1Bottom:
+                        pagesData[(state.pageIndex + 1) % state.maxSize],
+                    pageDataS1Top: pagesData[state.pageIndex],
+                    pageDataS2Bottom: pagesData[(state.pageIndex - 1) < 0
+                        ? state.pageIndex
+                        : state.pageIndex - 1],
+                    pageDataS2top: pagesData[state.pageIndex],
+                    selectedVerseIndex: state.selectedVerse,
+                  ),
+                ),
+                const SizedBox(
+                  height: 8,
+                ),
+                BlocBuilder<BannerAdPageCubit, BannerAdState>(
+                  builder: (context, state) {
+                    if (state is BannerAdLoadedState) {
+                      return Container(
+                        color: Colors.transparent,
+                        width: AdSize.banner.width.toDouble(),
+                        height: AdSize.banner.height.toDouble(),
+                        child: AdWidget(ad: AdHelper.pageBannerList!.bannerAd!),
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  },
+                )
+              ],
             ),
           ),
           floatingActionButton:

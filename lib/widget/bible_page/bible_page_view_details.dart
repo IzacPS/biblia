@@ -7,6 +7,7 @@ import 'package:biblia/repo/models/bible_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 // ignore: must_be_immutable
 class BiblePageViewDetails extends StatelessWidget {
@@ -42,6 +43,8 @@ class BiblePageViewDetails extends StatelessWidget {
       child:
           BlocBuilder<SelectVerseCubit, SelectVerseState>(builder: (_, state) {
         return ListView.builder(
+            //shrinkWrap: true,
+            //physics: const NeverScrollableScrollPhysics(),
             itemCount: itemCount,
             itemBuilder: (context, index) {
               var idx = f + index;

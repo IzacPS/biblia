@@ -1,15 +1,15 @@
 part of 'select_verse_cubit.dart';
 
-int idx = 0;
+//int idx = 0;
 
-abstract class SelectVerseState extends Equatable {
-  final int index;
-  const SelectVerseState(this.index);
+abstract class SelectVerseState {
+  //final int index;
+  const SelectVerseState();
 
-  @override
-  List<Object> get props => [index];
+  //@override
+  //List<Object> get props => [index];
 }
 
 class SelectVerseInitial extends SelectVerseState {
-  SelectVerseInitial() : super(idx++);
+  //SelectVerseInitial() : super(idx++);
 }

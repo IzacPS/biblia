@@ -40,7 +40,10 @@ class BookmarkScreen extends StatelessWidget {
           }
         },
         builder: (context, state) {
-          return ListView.builder(
+          return ListView.separated(
+            separatorBuilder: (context, index) {
+              return const Divider();
+            },
             itemCount: state.bookmarks.length,
             itemBuilder: (context, index) {
               var data = pagesData[state.bookmarks[index]];
