@@ -57,14 +57,14 @@ class AdHelper {
     pageBannerList = BannerAdInfo();
   }
 
-  static Future<void> loadMenuBanner() {
+  static loadMenuBanner() {
     //bannerAd?.dispose();
-    return mainMenuBannerAd!.load();
+    return mainMenuBannerAd?.load();
     //mainMenuBannerAd?.load();
   }
 
-  static Future<void> loadPageBanner() {
-    return pageBannerList!.load();
+  static loadPageBanner() {
+    return pageBannerList?.load();
   }
   // static BannerAdInfo? getCurrentPageBannerAndNext() {
   //   if (current_banner == 6) current_banner = 0;

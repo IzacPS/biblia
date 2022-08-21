@@ -24,7 +24,6 @@ class PopupCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool isSalm = false;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32.0),
@@ -54,8 +53,6 @@ class PopupCard extends StatelessWidget {
                     BlocBuilder<DropdownMenuSelectCubit<Book>,
                         DropdownMenuSelectState<Book>>(
                       builder: (_, state) {
-                        //debugPrint(state.value?.name);
-
                         book = state.value?.id ?? -1;
                         return DropdownButtonFormField<Book>(
                             decoration: InputDecoration(

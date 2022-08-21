@@ -62,7 +62,6 @@ class BiblePageViewDetails extends StatelessWidget {
                             : FontWeight.normal),
                   ),
                   onTap: () {
-                    //debugPrint(selected.toString());
                     if (!selectedVerses[index]) {
                       selectedVerses[index] = true;
                       selectedVersesToPrint[index] =

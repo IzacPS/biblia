@@ -156,7 +156,6 @@ class _BiblePageState extends State<BiblePageView>
         case ChangePageState.finalize:
         case ChangePageState.none:
         case ChangePageState.initial:
-          debugPrint('initial ------------------------');
           updateProgress(context);
           // AdHelper.loadAndGetNextPageBanner(() {
           //   context.read<BannerAdPageCubit>().loaded();
@@ -238,11 +237,17 @@ class _BiblePageState extends State<BiblePageView>
               BlocBuilder<FabStateCubit, StateState>(builder: (_, state) {
             if (state.enabled) {
               return SpeedDial(
+                icon: Icons.menu,
+                activeIcon: Icons.close,
                 children: [
                   SpeedDialChild(
                     child: const Icon(Icons.save),
                     label: 'Salvar',
-                    onTap: () {},
+                    onTap: () {
+                      // context
+                      //     .read<Database?>()
+                      //     ?.insert('saved', {'pagedataindex': index});
+                    },
                   ),
                   SpeedDialChild(
                     child: const Icon(Icons.share),
@@ -331,7 +336,6 @@ class _BiblePageState extends State<BiblePageView>
         color: Colors.brown,
         child: BlocBuilder<BookmarkStateCubit, BookmarkStateState>(
             builder: ((context, state) {
-          //debugPrint(state.toString());
           return IconButton(
             color: (data[index].bookmarked) ? Colors.yellow : Colors.white,
             onPressed: () {

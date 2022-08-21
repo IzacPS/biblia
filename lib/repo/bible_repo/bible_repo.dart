@@ -103,7 +103,6 @@ class BibleRepository {
   Future<void> setBookmarksFromDatabase(Database? database) async {
     if (database != null) {
       await database.rawQuery('SELECT * FROM bookmarks').then((value) {
-        //debugPrint(value.toString());
         for (var element in value) {
           var index = element['pagedataindex'] as int;
           pagesData[index].bookmarked = true;
