@@ -1,13 +1,11 @@
 // ignore: must_be_immutable
 import 'package:biblia/cubit/select_verse/select_verse_cubit.dart';
 import 'package:biblia/cubit/state/state_cubit.dart';
-import 'package:biblia/globals.dart';
 import 'package:biblia/repo/models/bible/bible.dart';
 import 'package:biblia/repo/models/bible_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 // ignore: must_be_immutable
 class BiblePageViewDetails extends StatelessWidget {

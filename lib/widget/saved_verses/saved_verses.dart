@@ -1,7 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 
 class SavedVersesScreen extends StatelessWidget {
   const SavedVersesScreen({Key? key}) : super(key: key);
@@ -15,13 +12,13 @@ class SavedVersesScreen extends StatelessWidget {
       body: ListView.separated(
         itemCount: 10,
         separatorBuilder: (context, index) {
-          return Divider();
+          return const Divider();
         },
         itemBuilder: (context, index) {
           return ListTile(
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [Text('Genesis 1'), Text('[1, 2, 4, 5]')],
+              children: const [Text('Genesis 1'), Text('[1, 2, 4, 5]')],
             ),
             trailing: IconButton(
               icon: const Icon(Icons.delete),

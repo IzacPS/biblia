@@ -1,6 +1,5 @@
 import 'package:biblia/bloc/bible_page_changer/bible_page_changer_bloc.dart';
 import 'package:biblia/cubit/bookmark_screen_changer/bookmark_screen_changer_cubit.dart';
-import 'package:biblia/cubit/read_progress/read_progress_cubit.dart';
 import 'package:biblia/repo/bible_repo/bible_repo.dart';
 import 'package:biblia/widget/bible_page/bible_page.dart';
 import 'package:flutter/material.dart';

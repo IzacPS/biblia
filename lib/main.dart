@@ -3,11 +3,13 @@ import 'package:biblia/bloc/app_starter/app_starter_bloc.dart';
 import 'package:biblia/bloc/bible_page_changer/bible_page_changer_bloc.dart';
 import 'package:biblia/cubit/banner_ad/banner_ad_cubit.dart';
 import 'package:biblia/cubit/bookmark_screen_changer/bookmark_screen_changer_cubit.dart';
+import 'package:biblia/cubit/bookmark_state/bookmark_state_cubit.dart';
 import 'package:biblia/cubit/read_progress/read_progress_cubit.dart';
+import 'package:biblia/cubit/select_verse/select_verse_cubit.dart';
+import 'package:biblia/cubit/state/state_cubit.dart';
 import 'package:biblia/repo/bible_repo/bible_repo.dart';
 import 'package:biblia/widget/bible_page/bible_page.dart';
 import 'package:biblia/widget/bookmark_screen/bookmark_screen.dart';
-import 'package:biblia/widget/saved_verses/saved_verses.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -55,6 +57,16 @@ Future<void> main() async {
                 BlocProvider(create: (_) => BookmarkScreenChangerCubit()),
                 BlocProvider(create: (_) => BannerAdCubit()),
                 BlocProvider(create: (_) => BannerAdPageCubit()),
+                //BlocProvider.value(value: context.read<BiblePageChangerBloc>()),
+                BlocProvider(create: (_) {
+                  return SelectVerseCubit();
+                }),
+                BlocProvider(create: (_) {
+                  return FabStateCubit();
+                }),
+                BlocProvider(create: (_) {
+                  return BookmarkStateCubit();
+                })
               ],
               child: const App(),
             ),
@@ -64,7 +76,6 @@ Future<void> main() async {
       );
     },
   );
-  //TODO: uncomment when ad is ready
 }
 
 class App extends StatelessWidget {
@@ -96,13 +107,11 @@ class App extends StatelessWidget {
               break;
             case StarterStateStatus.update:
             case StarterStateStatus.success:
-              w = HomePage();
+              w = const HomePage();
               break;
             case StarterStateStatus.loading:
-              // TODO: Handle this case.
               break;
             case StarterStateStatus.failure:
-              // TODO: Handle this case.
               break;
           }
           return w;
@@ -114,7 +123,7 @@ class App extends StatelessWidget {
 
 class HomePage extends StatelessWidget {
   //double progress = 0.0;
-  HomePage({Key? key}) : super(key: key);
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

@@ -26,7 +26,6 @@ class BibleRepository {
     await setBookmarksFromDatabase(database);
   }
 
-  //TODO: load by language
   Future<void> _readBibleFromFile() async {
     bible = Bible.fromJson(
         jsonDecode(await rootBundle.loadString('assets/json/pt_nvi.json')));
@@ -48,7 +47,6 @@ class BibleRepository {
     }
   }
 
-//TODO: configure with font size
   void getBiblePages() {
     double multiplier = 0;
     var textSize = screenWidth - 32;

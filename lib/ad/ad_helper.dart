@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class BannerAdInfo {
@@ -35,7 +34,6 @@ class BannerAdInfo {
 }
 
 class AdHelper {
-  static int current_banner = 0;
   static BannerAdInfo? mainMenuBannerAd;
   static BannerAdInfo? pageBannerList;
   static InterstitialAd? interstitialAd;

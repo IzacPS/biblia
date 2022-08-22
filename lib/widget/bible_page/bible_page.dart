@@ -4,7 +4,6 @@ import 'package:biblia/cubit/banner_ad/banner_ad_cubit.dart';
 import 'package:biblia/cubit/bookmark_state/bookmark_state_cubit.dart';
 import 'package:biblia/cubit/dropdown_menu_select/dropdown_menu_select_cubit.dart';
 import 'package:biblia/cubit/read_progress/read_progress_cubit.dart';
-import 'package:biblia/cubit/select_verse/select_verse_cubit.dart';
 import 'package:biblia/cubit/state/state_cubit.dart';
 import 'package:biblia/repo/bible_repo/bible_repo.dart';
 import 'package:biblia/repo/models/bible/bible.dart';
@@ -12,11 +11,9 @@ import 'package:biblia/repo/models/bible_page.dart';
 import 'package:biblia/widget/bible_page/bible_page_view_details.dart';
 import 'package:biblia/widget/bible_page_search/hero_dialog_route.dart';
 import 'package:biblia/widget/bible_page_search/popup_card.dart';
-import 'package:biblia/widget/expandable_fab/expandable_fab.dart';
 import 'package:flip_widget/flip_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:share_plus/share_plus.dart';
@@ -27,21 +24,7 @@ class BiblePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider.value(value: context.read<BiblePageChangerBloc>()),
-        BlocProvider(create: (_) {
-          return SelectVerseCubit();
-        }),
-        BlocProvider(create: (_) {
-          return FabStateCubit();
-        }),
-        BlocProvider(create: (_) {
-          return BookmarkStateCubit();
-        })
-      ],
-      child: const BiblePageView(),
-    );
+    return const BiblePageView();
   }
 }
 
