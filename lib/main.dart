@@ -203,44 +203,44 @@ class HomePage extends StatelessWidget {
                 },
               ),
             ),
-            Card(
-              child: GestureDetector(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    FaIcon(
-                      FontAwesomeIcons.floppyDisk,
-                      size: 56,
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 8),
-                      child: Text('Passagens Salvas'),
-                    ),
-                  ],
-                ),
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) => const SavedVersesScreen()));
-                },
-              ),
-            ),
-            Card(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  FaIcon(
-                    FontAwesomeIcons.gear,
-                    size: 56,
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(top: 8),
-                    child: Text('Configurações'),
-                  ),
-                ],
-              ),
-            ),
+            // Card(
+            //   child: GestureDetector(
+            //     child: Column(
+            //       mainAxisAlignment: MainAxisAlignment.center,
+            //       children: const [
+            //         FaIcon(
+            //           FontAwesomeIcons.floppyDisk,
+            //           size: 56,
+            //         ),
+            //         Padding(
+            //           padding: EdgeInsets.only(top: 8),
+            //           child: Text('Passagens Salvas'),
+            //         ),
+            //       ],
+            //     ),
+            //     onTap: () {
+            //       Navigator.push(
+            //           context,
+            //           MaterialPageRoute(
+            //               builder: (_) => const SavedVersesScreen()));
+            //     },
+            //   ),
+            // ),
+            // Card(
+            //   child: Column(
+            //     mainAxisAlignment: MainAxisAlignment.center,
+            //     children: const [
+            //       FaIcon(
+            //         FontAwesomeIcons.gear,
+            //         size: 56,
+            //       ),
+            //       Padding(
+            //         padding: EdgeInsets.only(top: 8),
+            //         child: Text('Configurações'),
+            //       ),
+            //     ],
+            //   ),
+            // ),
           ],
         ),
         bottomNavigationBar: BlocBuilder<BannerAdCubit, BannerAdState>(

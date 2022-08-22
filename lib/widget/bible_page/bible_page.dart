@@ -236,32 +236,42 @@ class _BiblePageState extends State<BiblePageView>
           floatingActionButton:
               BlocBuilder<FabStateCubit, StateState>(builder: (_, state) {
             if (state.enabled) {
-              return SpeedDial(
-                icon: Icons.menu,
-                activeIcon: Icons.close,
-                children: [
-                  SpeedDialChild(
-                    child: const Icon(Icons.save),
-                    label: 'Salvar',
-                    onTap: () {
-                      // context
-                      //     .read<Database?>()
-                      //     ?.insert('saved', {'pagedataindex': index});
-                    },
-                  ),
-                  SpeedDialChild(
-                    child: const Icon(Icons.share),
-                    label: 'Compartilhar',
-                    onTap: () {
-                      String str = '';
-                      state.selected.forEach((key, value) {
-                        str += '\n$value';
-                      });
-                      Share.share(str);
-                    },
-                  ),
-                ],
+              return FloatingActionButton(
+                child: const Icon(Icons.share),
+                onPressed: () {
+                  String str = '';
+                  state.selected.forEach((key, value) {
+                    str += '\n$value';
+                  });
+                  Share.share(str);
+                },
               );
+              // return SpeedDial(
+              //   icon: Icons.menu,
+              //   activeIcon: Icons.close,
+              //   children: [
+              //     SpeedDialChild(
+              //       child: const Icon(Icons.save),
+              //       label: 'Salvar',
+              //       onTap: () {
+              //         // context
+              //         //     .read<Database?>()
+              //         //     ?.insert('saved', {'pagedataindex': index});
+              //       },
+              //     ),
+              //     SpeedDialChild(
+              //       child: const Icon(Icons.share),
+              //       label: 'Compartilhar',
+              //       onTap: () {
+              //         String str = '';
+              //         state.selected.forEach((key, value) {
+              //           str += '\n$value';
+              //         });
+              //         Share.share(str);
+              //       },
+              //     ),
+              //   ],
+              // );
             }
             return const SizedBox.shrink();
           }));
