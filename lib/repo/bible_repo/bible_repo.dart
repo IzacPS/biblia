@@ -4,6 +4,7 @@ import 'package:biblia/repo/models/bible/bible.dart';
 import 'package:biblia/repo/models/bible_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:sqflite/sqflite.dart';
 
 class BibleRepository {
   late Bible bible;
@@ -18,13 +19,13 @@ class BibleRepository {
     screenHeight = height;
   }
 
-  Future<void> loadBible() async {
+  Future<void> loadBible(Database? database) async {
     await _readBibleFromFile();
     _configureBibleIndexes();
     getBiblePages();
+    await setBookmarksFromDatabase(database);
   }
 
-  //TODO: load by language
   Future<void> _readBibleFromFile() async {
     bible = Bible.fromJson(
         jsonDecode(await rootBundle.loadString('assets/json/pt_nvi.json')));
@@ -46,7 +47,6 @@ class BibleRepository {
     }
   }
 
-//TODO: configure with font size
   void getBiblePages() {
     double multiplier = 0;
     var textSize = screenWidth - 32;
@@ -95,6 +95,17 @@ class BibleRepository {
     debugPrint('pagesDataSize : ${pagesData.length}');
     for (int i = 0; i < 100; i++) {
       debugPrint(pagesData[i].toString());
+    }
+  }
+
+  Future<void> setBookmarksFromDatabase(Database? database) async {
+    if (database != null) {
+      await database.rawQuery('SELECT * FROM bookmarks').then((value) {
+        for (var element in value) {
+          var index = element['pagedataindex'] as int;
+          pagesData[index].bookmarked = true;
+        }
+      });
     }
   }
 }

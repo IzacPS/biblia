@@ -1,16 +1,25 @@
-import 'package:equatable/equatable.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 
 part 'select_verse_state.dart';
 
 class SelectVerseCubit extends Cubit<SelectVerseState> {
-  SelectVerseCubit() : super(const SelectVerseInitial());
+  SelectVerseCubit() : super(SelectVerseInitial());
 
-  selectIndex(int index) {
-    emit(SelectVerseIndex(index));
+  update() {
+    emit(SelectVerseInitial());
   }
 
-  unselect() {
-    emit(const SelectVerseInitial());
-  }
+  // selectIndex(int index) {
+  //   emit(SelectVerseIndex(index));
+  // }
+
+  // unselectAll() {
+  //   emit(SelectVerseInitial());
+  // }
+
+  // unselectIndex(int index){
+  //   emit(UnselectVerseIndex(index));
+  // }
+
+  // getSelected() => state;
 }

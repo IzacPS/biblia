@@ -1,6 +1,9 @@
+import 'package:biblia/ad/ad_helper.dart';
 import 'package:biblia/bloc/bible_page_changer/bible_page_changer_bloc.dart';
+import 'package:biblia/cubit/banner_ad/banner_ad_cubit.dart';
+import 'package:biblia/cubit/bookmark_state/bookmark_state_cubit.dart';
 import 'package:biblia/cubit/dropdown_menu_select/dropdown_menu_select_cubit.dart';
-import 'package:biblia/cubit/select_verse/select_verse_cubit.dart';
+import 'package:biblia/cubit/read_progress/read_progress_cubit.dart';
 import 'package:biblia/cubit/state/state_cubit.dart';
 import 'package:biblia/repo/bible_repo/bible_repo.dart';
 import 'package:biblia/repo/models/bible/bible.dart';
@@ -8,30 +11,20 @@ import 'package:biblia/repo/models/bible_page.dart';
 import 'package:biblia/widget/bible_page/bible_page_view_details.dart';
 import 'package:biblia/widget/bible_page_search/hero_dialog_route.dart';
 import 'package:biblia/widget/bible_page_search/popup_card.dart';
-import 'package:biblia/widget/expandable_fab/expandable_fab.dart';
 import 'package:flip_widget/flip_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:sqflite/sqflite.dart';
 
 class BiblePage extends StatelessWidget {
   const BiblePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider.value(value: context.read<BiblePageChangerBloc>()),
-        BlocProvider(create: (_) {
-          return SelectVerseCubit();
-        }),
-        BlocProvider(create: (_) {
-          return FabStateCubit();
-        })
-      ],
-      child: const BiblePageView(),
-    );
+    return const BiblePageView();
   }
 }
 
@@ -50,9 +43,13 @@ class _BiblePageState extends State<BiblePageView>
   late AnimationController _nextPageController;
   late AnimationController _prevPageController;
 
+  bool bookmarked = false;
+
   int index = 0;
   bool searchClicked = false;
   double tween = 0;
+  late Bible bible;
+  late List<BiblePageData> pagesData;
 
   @override
   void initState() {
@@ -90,17 +87,24 @@ class _BiblePageState extends State<BiblePageView>
     super.dispose();
   }
 
+  Future<void> updateProgress(BuildContext context) async {
+    context.read<ReadProgressCubit>().updateProgress(
+        context.read<BiblePageChangerBloc>().state.pageIndex /
+            context.read<BiblePageChangerBloc>().maxSize);
+  }
+
   @override
   Widget build(BuildContext context) {
-    var bible = context.read<BibleRepository>().bible;
-    var pagesData = context.read<BibleRepository>().pagesData;
+    AdHelper.loadPageBanner();
+    bible = context.read<BibleRepository>().bible;
+    pagesData = context.read<BibleRepository>().pagesData;
     return BlocBuilder<BiblePageChangerBloc, BiblePageChangerState>(
         builder: (c, state) {
       var data = pagesData[state.pageIndex];
       switch (state.pageState) {
         case ChangePageState.previousPage:
-          context.read<SelectVerseCubit>().unselect();
-          context.read<FabStateCubit>().setState(false);
+          //context.read<SelectVerseCubit>().unselectAll();
+          context.read<FabStateCubit>().setState(false, {});
           index = 1;
           _flipPagePrevKey.currentState?.startFlip().then((value) {
             _prevPageController.value = 0;
@@ -112,10 +116,11 @@ class _BiblePageState extends State<BiblePageView>
             });
             //});
           });
+          updateProgress(context);
           break;
         case ChangePageState.nextPage:
-          context.read<SelectVerseCubit>().unselect();
-          context.read<FabStateCubit>().setState(false);
+          //context.read<SelectVerseCubit>().unselectAll();
+          context.read<FabStateCubit>().setState(false, {});
           index = 0;
           _flipPageNextKey.currentState?.startFlip().then((value) {
             _nextPageController.value = 0;
@@ -126,6 +131,7 @@ class _BiblePageState extends State<BiblePageView>
               _flipPageNextKey.currentState?.stopFlip();
             });
           });
+          updateProgress(context);
           break;
         case ChangePageState.increment:
         case ChangePageState.decrement:
@@ -133,6 +139,11 @@ class _BiblePageState extends State<BiblePageView>
         case ChangePageState.finalize:
         case ChangePageState.none:
         case ChangePageState.initial:
+          updateProgress(context);
+          // AdHelper.loadAndGetNextPageBanner(() {
+          //   context.read<BannerAdPageCubit>().loaded();
+          // }).then((value) => ad = value);
+          break;
         case ChangePageState.exchangeStack:
           break;
         default:
@@ -146,6 +157,7 @@ class _BiblePageState extends State<BiblePageView>
               style: GoogleFonts.ptSans(),
             ),
             actions: [
+              _biblePageBookmark(pagesData, state.pageIndex),
               _biblePageSearch(),
             ],
           ),
@@ -167,50 +179,82 @@ class _BiblePageState extends State<BiblePageView>
                 }
               }
             },
-            child: _biblePageStack(
-              stack1Key: _flipPageNextKey,
-              stack2Key: _flipPagePrevKey,
-              stackIndex: index,
-              bible: bible,
-              pageDataS1Bottom:
-                  pagesData[(state.pageIndex + 1) % state.maxSize],
-              pageDataS1Top: pagesData[state.pageIndex],
-              pageDataS2Bottom: pagesData[(state.pageIndex - 1) < 0
-                  ? state.pageIndex
-                  : state.pageIndex - 1],
-              pageDataS2top: pagesData[state.pageIndex],
-              selectedVerseIndex: state.selectedVerse,
+            child: Column(
+              children: [
+                Expanded(
+                  child: _biblePageStack(
+                    stack1Key: _flipPageNextKey,
+                    stack2Key: _flipPagePrevKey,
+                    stackIndex: index,
+                    bible: bible,
+                    pageDataS1Bottom:
+                        pagesData[(state.pageIndex + 1) % state.maxSize],
+                    pageDataS1Top: pagesData[state.pageIndex],
+                    pageDataS2Bottom: pagesData[(state.pageIndex - 1) < 0
+                        ? state.pageIndex
+                        : state.pageIndex - 1],
+                    pageDataS2top: pagesData[state.pageIndex],
+                    selectedVerseIndex: state.selectedVerse,
+                  ),
+                ),
+                const SizedBox(
+                  height: 8,
+                ),
+                BlocBuilder<BannerAdPageCubit, BannerAdState>(
+                  builder: (context, state) {
+                    if (state is BannerAdLoadedState) {
+                      return Container(
+                        color: Colors.transparent,
+                        width: AdSize.banner.width.toDouble(),
+                        height: AdSize.banner.height.toDouble(),
+                        child: AdWidget(ad: AdHelper.pageBannerList!.bannerAd!),
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  },
+                )
+              ],
             ),
           ),
           floatingActionButton:
               BlocBuilder<FabStateCubit, StateState>(builder: (_, state) {
             if (state.enabled) {
-              return ExpandableFab(
-                distance: 112.0,
-                children: [
-                  FloatingActionButton(
-                    heroTag: null,
-                    onPressed: () {
-                      Share.share('hello');
-                    },
-                    child: const Icon(Icons.share),
-                  ),
-                  FloatingActionButton(
-                    heroTag: null,
-                    onPressed: () {
-                      //Share.share('hello');
-                    },
-                    child: const Icon(Icons.favorite),
-                  ),
-                  FloatingActionButton(
-                    heroTag: null,
-                    onPressed: () {
-                      //Share.share('hello');
-                    },
-                    child: const Icon(Icons.flag),
-                  ),
-                ],
+              return FloatingActionButton(
+                child: const Icon(Icons.share),
+                onPressed: () {
+                  String str = '';
+                  state.selected.forEach((key, value) {
+                    str += '\n$value';
+                  });
+                  Share.share(str);
+                },
               );
+              // return SpeedDial(
+              //   icon: Icons.menu,
+              //   activeIcon: Icons.close,
+              //   children: [
+              //     SpeedDialChild(
+              //       child: const Icon(Icons.save),
+              //       label: 'Salvar',
+              //       onTap: () {
+              //         // context
+              //         //     .read<Database?>()
+              //         //     ?.insert('saved', {'pagedataindex': index});
+              //       },
+              //     ),
+              //     SpeedDialChild(
+              //       child: const Icon(Icons.share),
+              //       label: 'Compartilhar',
+              //       onTap: () {
+              //         String str = '';
+              //         state.selected.forEach((key, value) {
+              //           str += '\n$value';
+              //         });
+              //         Share.share(str);
+              //       },
+              //     ),
+              //   ],
+              // );
             }
             return const SizedBox.shrink();
           }));
@@ -275,6 +319,36 @@ class _BiblePageState extends State<BiblePageView>
           ),
         ),
       ],
+    );
+  }
+
+  Widget _biblePageBookmark(List<BiblePageData> data, int index) {
+    return Hero(
+      tag: 'bible-page-bookmark-hero',
+      child: Material(
+        color: Colors.brown,
+        child: BlocBuilder<BookmarkStateCubit, BookmarkStateState>(
+            builder: ((context, state) {
+          return IconButton(
+            color: (data[index].bookmarked) ? Colors.yellow : Colors.white,
+            onPressed: () {
+              data[index].bookmarked = !data[index].bookmarked;
+              context.read<BookmarkStateCubit>().update();
+              if (data[index].bookmarked) {
+                context
+                    .read<Database?>()
+                    ?.insert('bookmarks', {'pagedataindex': index});
+              } else {
+                context.read<Database?>()?.delete('bookmarks',
+                    where: 'pagedataindex = ?', whereArgs: [index]);
+              }
+            },
+            icon: (data[index].bookmarked)
+                ? const Icon(Icons.bookmark_added)
+                : const Icon(Icons.bookmark_add),
+          );
+        })),
+      ),
     );
   }
 

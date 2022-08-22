@@ -4,9 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 part 'state_state.dart';
 
 class FabStateCubit extends Cubit<StateState> {
-  FabStateCubit() : super(const StateInitial());
+  FabStateCubit() : super(StateInitial());
 
-  void setState(bool enabled) {
-    emit(StateCurrent(enabled));
+  void setState(bool enabled, Map<int, String> selected) {
+    emit(StateCurrent(enabled, selected));
   }
 }

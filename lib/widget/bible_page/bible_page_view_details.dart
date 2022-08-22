@@ -4,7 +4,6 @@ import 'package:biblia/cubit/state/state_cubit.dart';
 import 'package:biblia/repo/models/bible/bible.dart';
 import 'package:biblia/repo/models/bible_page.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -13,7 +12,9 @@ class BiblePageViewDetails extends StatelessWidget {
   final Bible bible;
   final BiblePageData pagesData;
   final int selectedVerseIndex;
-  bool selected = false;
+  int selected = 0;
+  List<bool> selectedVerses = List.filled(30, false);
+  Map<int, String> selectedVersesToPrint = {};
 
   BiblePageViewDetails(this.bible, this.pagesData,
       {Key? key, this.selectedVerseIndex = -1})
@@ -27,19 +28,21 @@ class BiblePageViewDetails extends StatelessWidget {
     var t = pagesData.toVerse;
     var itemCount = (t - f + 1);
 
-    if (selectedVerseIndex > -1) {
-      selected = true;
-      context.read<FabStateCubit>().setState(true);
-      context.read<SelectVerseCubit>().selectIndex(selectedVerseIndex);
-    } else {
-      selected = false;
-    }
+    // if (selectedVerseIndex > -1) {
+    //   selected = true;
+    //   context.read<FabStateCubit>().setState(true);
+    //   context.read<SelectVerseCubit>().selectIndex(selectedVerseIndex);
+    // } else {
+    //   selected = false;
+    // }
 
     return Container(
       color: Colors.white,
       child:
           BlocBuilder<SelectVerseCubit, SelectVerseState>(builder: (_, state) {
         return ListView.builder(
+            //shrinkWrap: true,
+            //physics: const NeverScrollableScrollPhysics(),
             itemCount: itemCount,
             itemBuilder: (context, index) {
               var idx = f + index;
@@ -52,30 +55,29 @@ class BiblePageViewDetails extends StatelessWidget {
                     textAlign: TextAlign.justify,
                     style: GoogleFonts.ptSans(
                         fontSize: 18,
-                        fontWeight: (index == state.index)
+                        fontWeight: (selectedVerses[index])
                             ? FontWeight.bold
                             : FontWeight.normal),
                   ),
                   onTap: () {
-                    if (selected && state.index == index) {
-                      selected = false;
-                      context.read<SelectVerseCubit>().unselect();
-                      context.read<FabStateCubit>().setState(false);
+                    if (!selectedVerses[index]) {
+                      selectedVerses[index] = true;
+                      selectedVersesToPrint[index] =
+                          '${idx + 1}  ${bible.books[b].chapters[c].verses[idx].description}';
+                      selected++;
                     } else {
-                      selected = true;
-                      context.read<SelectVerseCubit>().selectIndex(index);
-                      context.read<FabStateCubit>().setState(true);
+                      selectedVerses[index] = false;
+                      selectedVersesToPrint.remove(index);
+                      selected--;
                     }
-                  },
-                  onLongPress: () {
-                    if (selected && state.index == index) {
-                      Clipboard.setData(ClipboardData(
-                          text: bible
-                              .books[b].chapters[c].verses[idx].description));
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                        content: Text('Copiado!'),
-                      ));
+                    if (selected > 0) {
+                      context
+                          .read<FabStateCubit>()
+                          .setState(true, selectedVersesToPrint);
+                    } else {
+                      context.read<FabStateCubit>().setState(false, {});
                     }
+                    context.read<SelectVerseCubit>().update();
                   },
                 ),
               );

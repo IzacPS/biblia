@@ -16,11 +16,12 @@ class BiblePageData {
   late int chapter;
   late int fromVerse;
   late int toVerse;
+  late bool bookmarked;
 
-  BiblePageData(this.book, this.chapter, this.fromVerse, this.toVerse);
+  BiblePageData(this.book, this.chapter, this.fromVerse, this.toVerse, {this.bookmarked = false});
 
   @override
   String toString() {
-    return 'BiblePageData($book,$chapter,$fromVerse,$toVerse)';
+    return 'BiblePageData($book,$chapter,$fromVerse,$toVerse,$bookmarked)';
   }
 }

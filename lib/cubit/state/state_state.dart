@@ -2,16 +2,17 @@ part of 'state_cubit.dart';
 
 abstract class StateState extends Equatable {
   final bool enabled;
-  const StateState(this.enabled);
+  final Map<int, String>  selected;
+  const StateState(this.enabled, this.selected);
 
   @override
-  List<Object> get props => [enabled];
+  List<Object> get props => [enabled, selected];
 }
 
 class StateInitial extends StateState {
-  const StateInitial() : super(false);
+  StateInitial() : super(false, {});
 }
 
 class StateCurrent extends StateState {
-  const StateCurrent(bool e) : super(e);
+  const StateCurrent(bool e, Map<int, String>  s) : super(e, s);
 }
