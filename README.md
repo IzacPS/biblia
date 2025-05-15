@@ -59,7 +59,7 @@ A tela de configurações oferece opções para personalizar a leitura:
 
 A busca é instantânea e permite navegar diretamente até qualquer trecho da Bíblia:
 
-<img src="images/search.gif" width="300">
+<img src="https://github.com/IzacPS/biblia/blob/main/images/search.gif" width="300">
 
 ---
 
