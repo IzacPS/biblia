@@ -10,6 +10,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../repository/bible_repository.dart';
 import '../screen/bible_screen.dart';
+import '../widgets/skeleton_loader.dart';
+import '../widgets/simple_progress_bar.dart';
+import '../theme/app_theme.dart';
 
 class RootScreen extends StatefulWidget {
   const RootScreen({super.key});
@@ -51,7 +54,9 @@ class _RootScreenState extends State<RootScreen> {
     final preferences = context.read<SharedPreferencesAsync>();
     unawaited(
       preferences.getDouble("progress").then((value) {
-        if (value != null) _progressNotifier.value = value;
+        if (value != null) {
+          _progressNotifier.value = value;
+        }
       }),
     );
   }
@@ -65,12 +70,44 @@ class _RootScreenState extends State<RootScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text(
+          'Bíblia Sagrada',
+          style: GoogleFonts.ptSans(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        centerTitle: true,
+      ),
       body: FutureBuilder(
         future: _loadBible(),
         builder: (context, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
-            return Center(child: CircularProgressIndicator());
+            return SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    SkeletonText(height: 28, width: 200),
+                    const SizedBox(height: 8),
+                    SkeletonText(height: 16, width: 100),
+                    const SizedBox(height: 32),
+                    Expanded(
+                      child: GridView.count(
+                        crossAxisCount: 2,
+                        children: const [
+                          SkeletonCard(),
+                          SkeletonCard(),
+                          SkeletonCard(),
+                          SkeletonCard(),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
           }
           return SafeArea(
             child: Padding(
@@ -80,37 +117,64 @@ class _RootScreenState extends State<RootScreen> {
                   Text(
                     "BÍBLIA SAGRADA",
                     style: GoogleFonts.ptSans(
-                      fontSize: 24,
+                      fontSize: 28,
                       fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
                   Text(
                     "Versão ACF",
-                    style: GoogleFonts.ptSans(fontWeight: FontWeight.bold),
+                    style: GoogleFonts.ptSans(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                      color: Theme.of(context).colorScheme.onBackground.withOpacity(0.7),
+                    ),
                   ),
                   SizedBox(height: 32),
                   GridView.count(
                     shrinkWrap: true,
                     crossAxisCount: 2,
+                    mainAxisSpacing: 12,
+                    crossAxisSpacing: 12,
                     children: [
                       GestureDetector(
                         child: Card(
-                          child: Stack(
-                            alignment: AlignmentDirectional.bottomCenter,
-                            children: [
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  FaIcon(FontAwesomeIcons.bookBible, size: 56),
-                                  Padding(
-                                    padding: EdgeInsets.only(top: 8),
-                                    child: Text(
-                                      'Leitura',
-                                      style: GoogleFonts.ptSans(),
-                                    ),
-                                  ),
-                                ],
+                          elevation: 4,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: Theme.of(context).brightness == Brightness.light
+                                    ? AppTheme.lightReadingGradient
+                                    : AppTheme.darkReadingGradient,
                               ),
+                            ),
+                            child: Stack(
+                              alignment: AlignmentDirectional.bottomCenter,
+                              children: [
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const FaIcon(
+                                      FontAwesomeIcons.bookBible, 
+                                      size: 56,
+                                      color: Colors.white,
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 8),
+                                      child: Text(
+                                        'Leitura',
+                                        style: GoogleFonts.ptSans(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ClipRRect(
                                 borderRadius: const BorderRadius.only(
                                   bottomLeft: Radius.circular(10),
@@ -119,14 +183,19 @@ class _RootScreenState extends State<RootScreen> {
                                 child: ValueListenableBuilder<double>(
                                   valueListenable: _progressNotifier,
                                   builder: (_, state, child) {
-                                    return LinearProgressIndicator(
-                                      minHeight: 8,
-                                      value: state,
+                                    return SimpleProgressBar(
+                                      progress: state,
+                                      height: 12,
+                                      filledColor: Theme.of(context).colorScheme.secondary,
+                                      emptyColor: Theme.of(context).brightness == Brightness.dark
+                                          ? const Color(0xFF3C3C3C)
+                                          : const Color(0xFFE8E0D6),
                                     );
                                   },
                                 ),
                               ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                         onTap: () {
@@ -155,18 +224,39 @@ class _RootScreenState extends State<RootScreen> {
                       ),
                       GestureDetector(
                         child: Card(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              FaIcon(FontAwesomeIcons.bookBookmark, size: 56),
-                              Padding(
-                                padding: EdgeInsets.only(top: 8),
-                                child: Text(
-                                  'Marcações',
-                                  style: GoogleFonts.ptSans(),
-                                ),
+                          elevation: 4,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: Theme.of(context).brightness == Brightness.light
+                                    ? AppTheme.lightBookmarkGradient
+                                    : AppTheme.darkBookmarkGradient,
                               ),
-                            ],
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const FaIcon(
+                                  FontAwesomeIcons.bookBookmark, 
+                                  size: 56,
+                                  color: Colors.white,
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 8),
+                                  child: Text(
+                                    'Marcações',
+                                    style: GoogleFonts.ptSans(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                         onTap: () {
@@ -193,57 +283,96 @@ class _RootScreenState extends State<RootScreen> {
                           );
                         },
                       ),
-                      Card(
-                        child: GestureDetector(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              FaIcon(
-                                FontAwesomeIcons.solidFloppyDisk,
-                                size: 56,
+                      GestureDetector(
+                        child: Card(
+                          elevation: 4,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: Theme.of(context).brightness == Brightness.light
+                                    ? AppTheme.lightSavedGradient
+                                    : AppTheme.darkSavedGradient,
                               ),
-                              Padding(
-                                padding: EdgeInsets.only(top: 8),
-                                child: Text(
-                                  'Passagens Salvas',
-                                  style: GoogleFonts.ptSans(),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const FaIcon(
+                                  FontAwesomeIcons.solidFloppyDisk,
+                                  size: 56,
+                                  color: Colors.white,
                                 ),
-                              ),
-                            ],
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 8),
+                                  child: Text(
+                                    'Passagens Salvas',
+                                    style: GoogleFonts.ptSans(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                          onTap: () {
-                            // Navigator.push(
-                            //   context,
-                            //   MaterialPageRoute(
-                            //     builder: (_) => const SavedVersesScreen(),
-                            //   ),
-                            // );
-                          },
                         ),
+                        onTap: () {
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: (_) => const SavedVersesScreen(),
+                          //   ),
+                          // );
+                        },
                       ),
-                      Card(
-                        child: GestureDetector(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              FaIcon(FontAwesomeIcons.gear, size: 56),
-                              Padding(
-                                padding: EdgeInsets.only(top: 8),
-                                child: Text(
-                                  'Configurações',
-                                  style: GoogleFonts.ptSans(),
+                      GestureDetector(
+                        child: Card(
+                          elevation: 4,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: Theme.of(context).brightness == Brightness.light
+                                    ? AppTheme.lightSettingsGradient
+                                    : AppTheme.darkSettingsGradient,
+                              ),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const FaIcon(
+                                  FontAwesomeIcons.gear, 
+                                  size: 56,
+                                  color: Colors.white,
                                 ),
-                              ),
-                            ],
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 8),
+                                  child: Text(
+                                    'Configurações',
+                                    style: GoogleFonts.ptSans(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => ConfigurationScreen(),
-                              ),
-                            );
-                          },
                         ),
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => ConfigurationScreen(),
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),

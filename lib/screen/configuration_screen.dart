@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../widgets/theme_settings_tile.dart';
 
 class ConfigurationScreen extends StatelessWidget {
   const ConfigurationScreen({super.key});
@@ -14,10 +15,16 @@ class ConfigurationScreen extends StatelessWidget {
           sections: [
             // SettingsSection(tiles: []),
             SettingsSection(
-              title: Text("Configurações", style: GoogleFonts.ptSans()),
+              title: Text("Aparência", style: GoogleFonts.ptSans()),
               tiles: [
-                SettingsTile(
+                const ThemeSettingsTile(),
+                SettingsTile.navigation(
                   title: Text("Tamanho da fonte", style: GoogleFonts.ptSans()),
+                  description: Text("Médio", style: GoogleFonts.ptSans()),
+                  leading: Icon(
+                    Icons.text_fields,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                   onPressed: (context) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
@@ -34,8 +41,12 @@ class ConfigurationScreen extends StatelessWidget {
             SettingsSection(
               title: Text("Informações", style: GoogleFonts.ptSans()),
               tiles: [
-                SettingsTile(
+                SettingsTile.navigation(
                   title: Text("Sobre o app", style: GoogleFonts.ptSans()),
+                  leading: Icon(
+                    Icons.info_outline,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                   onPressed: (context) {
                     showDialog(
                       context: context,
