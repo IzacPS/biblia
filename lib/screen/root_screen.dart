@@ -12,6 +12,7 @@ import '../repository/bible_repository.dart';
 import '../screen/bible_screen.dart';
 import '../widgets/skeleton_loader.dart';
 import '../widgets/simple_progress_bar.dart';
+import '../widgets/animated_menu_card.dart';
 import '../theme/app_theme.dart';
 
 class RootScreen extends StatefulWidget {
@@ -70,16 +71,7 @@ class _RootScreenState extends State<RootScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Bíblia Sagrada',
-          style: GoogleFonts.ptSans(
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
-        centerTitle: true,
-      ),
+      appBar: AppBar(),
       body: FutureBuilder(
         future: _loadBible(),
         builder: (context, snapshot) {
@@ -158,7 +150,7 @@ class _RootScreenState extends State<RootScreen> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     const FaIcon(
-                                      FontAwesomeIcons.bookBible, 
+                                      FontAwesomeIcons.bookOpen, 
                                       size: 56,
                                       color: Colors.white,
                                     ),
@@ -240,7 +232,7 @@ class _RootScreenState extends State<RootScreen> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 const FaIcon(
-                                  FontAwesomeIcons.bookBookmark, 
+                                  FontAwesomeIcons.bookmark, 
                                   size: 56,
                                   color: Colors.white,
                                 ),
@@ -301,7 +293,7 @@ class _RootScreenState extends State<RootScreen> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 const FaIcon(
-                                  FontAwesomeIcons.solidFloppyDisk,
+                                  FontAwesomeIcons.solidHeart,
                                   size: 56,
                                   color: Colors.white,
                                 ),
@@ -347,7 +339,7 @@ class _RootScreenState extends State<RootScreen> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 const FaIcon(
-                                  FontAwesomeIcons.gear, 
+                                  FontAwesomeIcons.sliders, 
                                   size: 56,
                                   color: Colors.white,
                                 ),

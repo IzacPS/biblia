@@ -72,9 +72,17 @@ class _BiblePageState extends State<BibleScreen> {
       builder: (_, snapshot) {
         if (snapshot.connectionState != ConnectionState.done ||
             snapshot.data == null) {
-          return Container(
-            color: Colors.white,
-            child: Center(child: RefreshProgressIndicator()),
+          return Scaffold(
+            body: Container(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              child: Center(
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+              ),
+            ),
           );
         }
         final value = snapshot.data!;
@@ -85,7 +93,13 @@ class _BiblePageState extends State<BibleScreen> {
             title: ValueListenableBuilder<String>(
               valueListenable: _appBarNotifier,
               builder: (context, title, _) {
-                return Text(title, style: GoogleFonts.ptSans());
+                return Text(
+                  title,
+                  style: GoogleFonts.ptSans(
+                    color: Theme.of(context).appBarTheme.foregroundColor,
+                    fontWeight: FontWeight.w600,
+                  ),
+                );
               },
             ),
             actions: [
